@@ -24,34 +24,28 @@
       var map = L.map('map').setView([39.680884,-75.073375], 14);
 
       // add OpenStreetMap basemap
-      L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
       var url_to_geotiff_file = "https://seantwo.github.io/RSE-GlassboroWildLife-Map/test_2025.tif";
 
-      function determineColor(pixelValues) {
-        const value = pixelValues[0];
-
-        // treat 0 (or your nodata value) as transparent
-        if (value === 0 || value === georaster.noDataValue) {
-          return null; // transparent
-        }
-        if (value === 1) {
-          return 'rgba(255, 4, 69, 1)';
-        }
-        if (value === 2) {
-          return 'rgba(242, 255, 178, 1)';
-        }
-        if (value === 3) {
-          return 'rgba(45, 162, 38, 1)';
-        }
-        else {
-          return 'rgba(0, 0, 0, 0)'; // default color for other values
-        }
-      }
-
       parseGeoraster(url_to_geotiff_file).then(georaster => {
+
+        function determineColor(pixelValues) {
+          const value = pixelValues[0];
+
+          if (value === 0 || value === georaster.noDataValue) {
+            return null;
+          }
+
+          if (value === 1) return 'rgba(255, 4, 69, 1)';
+          if (value === 2) return 'rgba(242, 255, 178, 1)';
+          if (value === 3) return 'rgba(45, 162, 38, 1)';
+
+          return null;
+        }
+        
         var layer = new GeoRasterLayer({
             georaster: georaster,
             resolution: 128,
