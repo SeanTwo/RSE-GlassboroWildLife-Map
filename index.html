@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <style>
       #map {
         bottom: 0;
@@ -11,50 +11,59 @@
         right: 0;
         top: 0;
       }
+
+      .leaflet-control-layers-toggle {
+          width: 70px !important;
+          height: 70px !important;
+          background-image: url('https://static.thenounproject.com/png/3402667-200.png') !important;
+          background-size: 60px 60px !important;
+      }
     </style>
   </head>
   <body>
     <div id="map"></div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/proj4@2.20.8/dist/proj4-src.js"></script>
-    <script src="https://unpkg.com/georaster@1.6.0/dist/georaster.browser.bundle.min.js"></script>
-    <script src="https://unpkg.com/georaster-layer-for-leaflet@4.1.2/dist/v3/webpack/bundle/georaster-layer-for-leaflet.min.js"></script>
+    <script src="https://unpkg.com/sql.js@0.3.2/js/sql.js"></script>
+    <script src="./Leaflet.TileLayer.MBTiles.js"></script>
     <script>
       // initalize leaflet map
       var map = L.map('map').setView([39.680884,-75.073375], 14);
 
       // add OpenStreetMap basemap
-      L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+      var osm = L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
           attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      });
+
+      var gsat3 = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
+          attribution: 'Google Maps Sattelite Imagers: <a href="http://osm.org/copyright">Google Maps</a>'
       }).addTo(map);
 
-      var url_to_geotiff_file = "https://seantwo.github.io/RSE-GlassboroWildLife-Map/test_2025.tif";
+      var baseMaps = {
+        "OpenStreetMap": osm,
+        "Google Sattelite": gsat3
+      };
 
-      parseGeoraster(url_to_geotiff_file).then(georaster => {
-
-        function determineColor(pixelValues) {
-          const value = pixelValues[0];
-
-          if (value === 0 || value === georaster.noDataValue) {
-            return null;
-          }
-
-          if (value === 1) return 'rgba(255, 4, 69, 1)';
-          else if (value === 2) return 'rgba(242, 255, 178, 1)';
-          else if (value === 3) return 'rgba(45, 162, 38, 1)';
-        }
-
-        var layer = new GeoRasterLayer({
-            georaster: georaster,
-            resolution: 32,
-            pixelValuesToColorFn: determineColor
+      const startYear = 2015;
+      const endYear = 2025;
+      
+      var three_class_yrs = {};
+      for (var i = startYear; i <= endYear; i++) {
+        var yr_imagery = L.tileLayer.mbTiles(`./GWP_3_class_${i}.mbtiles`, {
+          minZoom: 1,
+          maxZoom: 18
         });
-        layer.addTo(map);
+        yr_imagery.bringToFront();
+        three_class_yrs[`GWP 3 Classes of Fire Damage ${i}`] = yr_imagery;
+        if (i === endYear) {
+          yr_imagery.addTo(map);
+        }
+      }
 
-        map.fitBounds(layer.getBounds());
+      var layerControl = L.control.layers(baseMaps, three_class_yrs).addTo(map);
 
-    });
-
+      map.on('layeradd', function () {
+        Object.entries(three_class_yrs).forEach(([key, value]) => { value.bringToFront(); });
+      });
     </script>
   </body>
 </html>
