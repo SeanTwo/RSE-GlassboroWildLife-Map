@@ -16,9 +16,9 @@
   <body>
     <div id="map"></div>
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/proj4"></script>
-    <script src="https://unpkg.com/georaster@1.6.0/dist/georaster.browserify.min.js"></script>
-    <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
+    <script src="https://cdn.jsdelivr.net/npm/proj4@2.9.0/dist/proj4.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/georaster@1.6.0/dist/georaster.browserify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/georaster-layer-for-leaflet@3.10.0/dist/georaster-layer-for-leaflet.min.js"></script>
     <script>
       // initalize leaflet map
       var map = L.map('map').setView([39.680884,-75.073375], 14);
@@ -32,9 +32,18 @@
 
       parseGeoraster(url_to_geotiff_file).then(georaster => {
         var layer = new GeoRasterLayer({
-            attribution: "Planet",
             georaster: georaster,
-            resolution: 128
+            resolution: 128,
+            pixelValuesToColorFn: function(pixelValues) {
+              const value = pixelValues[0];
+
+              // treat 0 (or your nodata value) as transparent
+              if (value === 0 || value === georaster.noDataValue) {
+                return null; // transparent
+              }
+
+              return `rgba(${value}, ${value}, ${value}, 1)`; // basic grayscale example
+            }
         });
         layer.addTo(map);
 
