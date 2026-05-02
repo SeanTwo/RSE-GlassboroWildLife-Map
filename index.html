@@ -28,7 +28,7 @@
           attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(map);
 
-      var url_to_geotiff_file = "./test_2025.tif";
+      var url_to_geotiff_file = "https://seantwo.github.io/RSE-GlassboroWildLife-Map/test_2025.tif";
 
       parseGeoraster(url_to_geotiff_file).then(georaster => {
         var layer = new GeoRasterLayer({
