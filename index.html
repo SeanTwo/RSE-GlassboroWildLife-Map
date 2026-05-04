@@ -3,6 +3,9 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/sql.js@0.3.2/js/sql.js"></script>
+    <script src="./scripts/Leaflet.TileLayer.MBTiles.js"></script>
     <style>
       #map {
         bottom: 0;
@@ -18,29 +21,54 @@
           background-image: url('https://static.thenounproject.com/png/3402667-200.png') !important;
           background-size: 60px 60px !important;
       }
+
+      #legend {
+        position: absolute;
+        bottom: 30px;
+        left: 10px;
+        background-color: rgba(255, 255, 255, 0.7);
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        font-family: Arial, sans-serif;
+        z-index: 2000;
+      }
+
+      #legend h3 {
+        font-family: 'Arial';
+        margin-top: 10px;
+        margin-bottom: 5px;
+        color: #6aa84f;
+        -webkit-text-stroke: 1px black;
+        font-size: 28pt;
+      }
+      
+      #legend p {
+        font-family: 'Arial';
+        color: #6aa84f;
+        -webkit-text-stroke: 0.5px black;
+        font-size: 16pt;
+      }
     </style>
   </head>
   <body>
     <div id="map"></div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/sql.js@0.3.2/js/sql.js"></script>
-    <script src="./Leaflet.TileLayer.MBTiles.js"></script>
+    <div id="legend">
+        <h3>Legend</h3>
+        <p><mark style="color: #ff0445; background-color: #ff0445; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>Class 1:</strong> Very Damaged</p>
+        <p><mark style="color: #f2ffb2; background-color: #f2ffb2; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>Class 2:</strong> Damaged</p>
+        <p><mark style="color: #2da226; background-color: #2da226; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>Class 3:</strong> Regular NDVI Levels</p>
+    </div>
     <script>
       // initalize leaflet map
       var map = L.map('map').setView([39.680884,-75.073375], 14);
 
-      // add OpenStreetMap basemap
-      var osm = L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-      });
-
-      var gsat3 = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
-          attribution: 'Google Maps Sattelite Imagers: <a href="http://osm.org/copyright">Google Maps</a>'
+      var gsat = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
+          attribution: 'Google Maps Sattelite Images: <a href="https://maps.google.com/">Google Maps</a>'
       }).addTo(map);
 
       var baseMaps = {
-        "OpenStreetMap": osm,
-        "Google Sattelite": gsat3
+        "Google Sattelite": gsat
       };
 
       const startYear = 2015;
