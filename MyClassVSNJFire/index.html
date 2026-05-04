@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>GWP Fire 3 Classes archive 2015-2025</title>
+    <title>GWP Fire My 3 Classes vs NJ Forest Fire Service 2024</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/sql.js@0.3.2/js/sql.js"></script>
-    <script src="./scripts/Leaflet.TileLayer.MBTiles.js"></script>
+    <script src="../scripts/Leaflet.TileLayer.MBTiles.js"></script>
     <style>
       #map {
         bottom: 0;
@@ -72,12 +72,12 @@
         "Google Sattelite": gsat
       };
 
-      const startYear = 2015;
-      const endYear = 2025;
+      const startYear = 2024;
+      const endYear = 2024;
       
       var three_class_yrs = {};
       for (var i = startYear; i <= endYear; i++) {
-        var yr_imagery = L.tileLayer.mbTiles(`./GWP_3_class_${i}.mbtiles`, {
+        var yr_imagery = L.tileLayer.mbTiles(`../GWP_3_class_${i}.mbtiles`, {
           minZoom: 1,
           maxZoom: 18
         });
@@ -93,6 +93,32 @@
       map.on('layeradd', function () {
         Object.entries(three_class_yrs).forEach(([key, value]) => { value.bringToFront(); });
       });
+
+      async function setup() {
+        var FP_gj = await fetch("./NJ_FFS_GWP_Fire_Polygons.geojson").then(res => res.json());
+        var Fire_Polygons = L.geoJSON(FP_gj, {
+            style: function(feature) {
+                if (feature.properties.overlap_dmg === true)
+                    return {
+                    color: '#000000',
+                    weight: 2,
+                    fillColor: '#0000ff',
+                    fillOpacity: 0.4,
+                    radius: 5
+                    };
+                else {
+                    return {
+                    color: '#000000',
+                    weight: 2,
+                    fillColor: '#ff0000',
+                    fillOpacity: 0.8,
+                    radius: 5
+                    };
+                }
+            }
+        }).addTo(map);
+      }
+      setup();
     </script>
   </body>
 </html>
