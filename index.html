@@ -2,9 +2,7 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css" />
-    <link rel="stylesheet" href="https://prominentedge.com/leaflet-measure-path/leaflet-measure-path.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <style>
       #map {
         bottom: 0;
@@ -24,11 +22,9 @@
   </head>
   <body>
     <div id="map"></div>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/sql.js@0.3.2/js/sql.js"></script>
-    <script src="./scripts/Leaflet.TileLayer.MBTiles.js"></script>
-    <script src="https://npmcdn.com/leaflet-editable@0.6.2/src/Leaflet.Editable.js" ></script>
-    <script src="https://prominentedge.com/leaflet-measure-path/leaflet-measure-path.js"></script>
+    <script src="./Leaflet.TileLayer.MBTiles.js"></script>
     <script>
       // initalize leaflet map
       var map = L.map('map').setView([39.680884,-75.073375], 14);
@@ -64,9 +60,6 @@
       }
 
       var layerControl = L.control.layers(baseMaps, three_class_yrs).addTo(map);
-
-      const measurePolygonControl = L.control.measurePolygon();
-      measurePolygonControl.addTo(map);
 
       map.on('layeradd', function () {
         Object.entries(three_class_yrs).forEach(([key, value]) => { value.bringToFront(); });
