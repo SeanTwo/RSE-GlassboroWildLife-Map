@@ -98,7 +98,7 @@
         var FP_gj = await fetch("./NJ_FFS_GWP_Fire_Polygons.geojson").then(res => res.json());
         var Fire_Polygons = L.geoJSON(FP_gj, {
             style: function(feature) {
-                if (feature.properties.overlap_dmg === true)
+                if (feature.properties.ovrlap_dmg === true)
                     return {
                         color: '#000000',
                         weight: 2,
