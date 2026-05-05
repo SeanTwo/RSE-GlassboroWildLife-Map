@@ -4,9 +4,12 @@
     <title>GWP Fire My 3 Classes vs NJ Forest Fire Service 2024</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/sql.js@0.3.2/js/sql.js"></script>
     <script src="../scripts/Leaflet.TileLayer.MBTiles.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <style>
       #map {
         bottom: 0;
@@ -32,33 +35,61 @@
         border-radius: 5px;
         box-shadow: 0 0 5px rgba(0,0,0,0.3);
         font-family: Arial, sans-serif;
-        z-index: 2000;
+        z-index: 2001;
       }
 
-      #legend h3 {
-        font-family: 'Arial';
+      #legend_text h3 {
+        font-family: 'Arial' !important;
         margin-top: 10px;
         margin-bottom: 5px;
         color: #6aa84f;
         -webkit-text-stroke: 1px black;
         font-size: 28pt;
       }
+
+      #legend_text h4 {
+        font-family: 'Arial' !important;
+        color: #406530;
+        font-size: 12pt;
+      }
       
-      #legend p {
-        font-family: 'Arial';
+      #legend_text p {
+        font-family: 'Arial' !important;
         color: #6aa84f;
         -webkit-text-stroke: 0.5px black;
         font-size: 16pt;
+      }
+      
+      #legend button {
+        color: #ffffff;
+        background-color: #686868;
+        border: 2px solid #000000;
+        border-radius: 5px;
+        padding: 8px 12px 8px 12px;
+        font-size: 12pt;
+      }
+
+      .leaflet-popup-content {
+        font-family: 'Arial' !important;
+        font-size: 10pt;
+        color: #000000;
       }
     </style>
   </head>
   <body>
     <div id="map"></div>
     <div id="legend">
-        <h3>Legend</h3>
-        <p><mark style="color: #ff0445; background-color: #ff0445; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>Class 1:</strong> Very Damaged</p>
-        <p><mark style="color: #f2ffb2; background-color: #f2ffb2; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>Class 2:</strong> Damaged</p>
-        <p><mark style="color: #2da226; background-color: #2da226; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>Class 3:</strong> Regular NDVI Levels</p>
+        <button type="button" class="Legend Button" data-toggle="collapse" data-target="#legend_text">Show Legend?</button>
+        <div id="legend_text" class="collapse in">
+            <h3>Legend</h3>
+            <h4>Fire Damage Classes</h4>
+            <p><mark style="color: #ff0445; background-color: #ff0445; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>Class 1:</strong> Very Damaged</p>
+            <p><mark style="color: #f2ffb2; background-color: #f2ffb2; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>Class 2:</strong> Damaged</p>
+            <p><mark style="color: #2da226; background-color: #2da226; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>Class 3:</strong> Regular NDVI Levels</p>
+            <h4>Fire Polygons classes</h4>
+            <p><mark style="color: #1abaf0CC; background-color: #1abaf0CC; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>Overlap w/damage pixels</strong></p>
+            <p><mark style="color: #e68302CC; background-color: #e68302CC; font-size: 20pt;">&nbsp;&nbsp;&nbsp;&nbsp;</mark> <strong>No Overlap w/damage pixels</strong></p>
+        </div>
     </div>
     <script>
       // initalize leaflet map
@@ -102,19 +133,30 @@
                     return {
                         color: '#000000',
                         weight: 2,
-                        fillColor: '#0000ff',
-                        fillOpacity: 1
+                        fillColor: '#1abaf0',
+                        fillOpacity: 0.8
                     };
                 else {
                     return {
                         color: '#000000',
                         weight: 2,
-                        fillColor: '#ff0000',
-                        fillOpacity: 1
+                        fillColor: '#e68302',
+                        fillOpacity: 0.8
                     };
                 }
+            },
+            onEachFeature: function (feature, layer) {
+                layer.bindPopup(`<strong>Fire Area:</strong> ${feature.properties.GIS_PARCEL}<br>
+                                 <strong>Burn Date:</strong> ${feature.properties.BURN_DATE}<br>
+                                 <strong>Overlap with GWP 3 Class Damage:</strong> ${feature.properties.ovrlap_dmg}<br>
+                                 <strong>Burned Foiliage Type:</strong> ${feature.properties.FUEL_TYPE}<br>
+                                 <strong>Area in Acres:</strong> ${feature.properties.ACRES} Acres
+                `);
+                layer.on('mouseover', function () { this.openPopup(); });
+                layer.on('mouseout', function () { this.closePopup(); });
             }
         }).addTo(map);
+        layerControl.addOverlay(Fire_Polygons, "NJ Forest Fire Service Fire Polygons")
       }
       setup();
     </script>
